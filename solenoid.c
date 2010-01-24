@@ -32,14 +32,14 @@ ISR(TIMER2_COMP_vect)
 	{
 	case 0:
 
-		if (clutch_a_duty==clutch_b_duty)
+		if (clutch_a_duty == clutch_b_duty)
 		{
 			/// Turn both A and B off
 			driver_state |= SOL_CLUTCH_A | SOL_CLUTCH_B;
 			OCR2A = SOL_DUTY_SCALE * (100 - clutch_a_duty);
 			pwm_state = 2;
 		}
-		else if (clutch_a_duty>clutch_b_duty)
+		else if (clutch_a_duty > clutch_b_duty)
 		{
 			/// Turn off B
 			driver_state |= SOL_CLUTCH_B;
@@ -56,13 +56,13 @@ ISR(TIMER2_COMP_vect)
 		break;
 
 	case 1:
-		if (clutch_a_duty>clutch_b_duty)
+		if (clutch_a_duty>clutch_b_duty && clutch_a_duty < 100)
 		{
 			/// Turn off A
 			driver_state |= SOL_CLUTCH_A;
 			OCR2A = SOL_DUTY_SCALE * (100 - clutch_a_duty);
 		}
-		else
+		else if (clutch_b_duty < 100)
 		{
 			/// Turn off B
 			driver_state |= SOL_CLUTCH_B;
@@ -74,18 +74,27 @@ ISR(TIMER2_COMP_vect)
 	case 2:
 
 		/// Turn both PWMs on if duty > 0
-		if (clutch_a_duty>0)
+		if (clutch_a_duty > 0)
 			driver_state &= ~SOL_CLUTCH_A;
+		else
+			driver_state |= SOL_CLUTCH_A;
 
-		if (clutch_b_duty>0)
+		if (clutch_b_duty > 0)
 			driver_state &= ~SOL_CLUTCH_B;
+		else
+			driver_state |= SOL_CLUTCH_B;
 
-		if (clutch_a_duty>clutch_b_duty)
+		if (clutch_a_duty > clutch_b_duty || clutch_a_duty == 0)
 			OCR2A = SOL_DUTY_SCALE * clutch_b_duty;
 		else
 			OCR2A = SOL_DUTY_SCALE * clutch_a_duty;
 
-		pwm_state = 0;
+		if (clutch_a_duty == 0 || clutch_a_duty == 100 ||
+			clutch_b_duty == 0 || clutch_b_duty == 100)
+			pwm_state = 1;
+		else
+			pwm_state = 0;
+
 		break;
 	}
 
