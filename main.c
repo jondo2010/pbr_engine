@@ -12,15 +12,9 @@
 
 #include <spi.h>
 #include <adc.h>
+#include <can.h>
 
-#include "solenoid.h"
-
-static uint8_t delay = 50;
-
-void callback (uint8_t d)
-{
-	delay = d;
-}
+#include "engine.h"
 
 #define DAC_FAST_MODE	0x4000
 #define DAC_POWER_DOWN	0x2000
@@ -37,13 +31,10 @@ get_dac_word
 int
 main (void)
 {
-	DDRG = _BV (PE2);
+	DDRG |= _BV (PE2);
 
-	solenoid_init_output_driver ();
-	solenoid_init_clutch_pwm ();
-
-	solenoid_set_clutch_a_duty (50);
-	solenoid_set_clutch_b_duty (25);
+	engine_init ();
+	engine_set_clutch_position (50);
 
 	sei ();
 
@@ -53,11 +44,21 @@ main (void)
 	//adc_set_conversion_callback (&callback);
 	//adc_enable ();
 
-	uint8_t cnt = 0;
-	uint16_t value = 0;
+	can_init (baud_1000);
+
+	mob_config_t mob1;
+	mob1.id = 0xab;
+	mob1.id_type = standard;
+	mob1.mode = transmit;
+
+	uint8_t data[] = "TESTING";
+
+	can_config_mob (0, &mob1);
 
 	for (;;)
 	{
+		can_load_data (0, data, 7);
+		can_ready_to_send (0);
 /*
 		value = get_dac_word (cnt);
 
