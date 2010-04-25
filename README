@@ -1,0 +1,11 @@
+Engine Module
+
+engine_can_impl.{h,c}
+	- Initializes CAN driver
+	- Sets up message objs, sets up callbacks for incoming messages
+	- Provides interface for sending data out
+	
+engine_param_iface.{h,c}
+	- Defines all module parameters
+	- Getter/setters for parameters
+	- Reads/Stores parameters to EEPROM

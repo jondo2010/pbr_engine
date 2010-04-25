@@ -33,9 +33,7 @@
 <option id="de.innot.avreclipse.compiler.option.debug.level.387648146" name="Generate Debugging Info" superClass="de.innot.avreclipse.compiler.option.debug.level"/>
 <option id="de.innot.avreclipse.compiler.option.optimize.373835952" name="Optimization Level" superClass="de.innot.avreclipse.compiler.option.optimize"/>
 <option id="de.innot.avreclipse.compiler.option.incpath.1741741972" name="Include Paths (-I)" superClass="de.innot.avreclipse.compiler.option.incpath" valueType="includePath">
-<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libspi}&quot;"/>
-<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libcan}&quot;"/>
-<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libadc}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/}&quot;"/>
 </option>
 <inputType id="de.innot.avreclipse.compiler.winavr.input.1126146916" name="C Source Files" superClass="de.innot.avreclipse.compiler.winavr.input"/>
 </tool>
@@ -46,11 +44,13 @@
 <tool id="de.innot.avreclipse.tool.linker.winavr.app.debug.1371659466" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.debug">
 <option id="de.innot.avreclipse.linker.option.libs.160718820" name="Libraries (-l)" superClass="de.innot.avreclipse.linker.option.libs" valueType="libs">
 <listOptionValue builtIn="false" value="spi"/>
+<listOptionValue builtIn="false" value="eeprom"/>
 <listOptionValue builtIn="false" value="can"/>
 <listOptionValue builtIn="false" value="adc"/>
 </option>
 <option id="de.innot.avreclipse.linker.option.libpath.935698596" name="Libraries Path (-L)" superClass="de.innot.avreclipse.linker.option.libpath" valueType="stringList">
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libspi/Debug}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libeeprom/Debug}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libcan/Debug}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libadc/Debug}&quot;"/>
 </option>
@@ -497,6 +497,8 @@
 </storageModule>
 <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 <storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cconfiguration>
 <cconfiguration id="de.innot.avreclipse.configuration.app.release.1915518931">
 <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="de.innot.avreclipse.configuration.app.release.1915518931" moduleId="org.eclipse.cdt.core.settings" name="Release">
@@ -976,6 +978,8 @@
 </storageModule>
 <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 <storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cconfiguration>
 </storageModule>
 <storageModule moduleId="cdtBuildSystem" version="4.0.0">

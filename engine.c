@@ -9,7 +9,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <spi.h>
+#include <libspi/spi.h>
+#include <libadc/adc.h>
 
 #include "engine.h"
 #include "engine_prv.h"
@@ -33,49 +34,6 @@ ISR(TIMER2_COMP_vect)
 	switch (pwm_state)
 	{
 	case 0:
-
-		if (clutch_a_duty == clutch_b_duty)
-		{
-			/// Turn both A and B off
-			driver_state |= SOL_CLUTCH_A | SOL_CLUTCH_B;
-			OCR2A = PWM_DUTY_SCALE * (100 - clutch_a_duty);
-			pwm_state = 2;
-		}
-		else if (clutch_a_duty > clutch_b_duty)
-		{
-			/// Turn off B
-			driver_state |= SOL_CLUTCH_B;
-			OCR2A = PWM_DUTY_SCALE * (clutch_a_duty-clutch_b_duty);
-			pwm_state = 1;
-		}
-		else
-		{
-			/// Turn off A
-			driver_state |= SOL_CLUTCH_A;
-			OCR2A = PWM_DUTY_SCALE * (clutch_b_duty-clutch_a_duty);
-			pwm_state = 1;
-		}
-		break;
-
-	case 1:
-		if (clutch_a_duty>clutch_b_duty && clutch_a_duty < 100)
-		{
-			/// Turn off A
-			driver_state |= SOL_CLUTCH_A;
-			OCR2A = PWM_DUTY_SCALE * (100 - clutch_a_duty);
-		}
-		else if (clutch_b_duty < 100)
-		{
-			/// Turn off B
-			driver_state |= SOL_CLUTCH_B;
-			OCR2A = PWM_DUTY_SCALE * (100 - clutch_b_duty);
-		}
-		pwm_state = 2;
-		break;
-
-	case 2:
-
-		/// Turn both PWMs on if duty > 0
 		if (clutch_a_duty > 0)
 			driver_state &= ~SOL_CLUTCH_A;
 		else
@@ -86,17 +44,80 @@ ISR(TIMER2_COMP_vect)
 		else
 			driver_state |= SOL_CLUTCH_B;
 
-		if (clutch_a_duty > clutch_b_duty || clutch_a_duty == 0)
+		if ((clutch_a_duty > clutch_b_duty || clutch_a_duty == 0) && clutch_b_duty > 0)
+		{
 			OCR2A = PWM_DUTY_SCALE * clutch_b_duty;
-		else
-			OCR2A = PWM_DUTY_SCALE * clutch_a_duty;
-
-		if (clutch_a_duty == 0 || clutch_a_duty == 100 ||
-			clutch_b_duty == 0 || clutch_b_duty == 100)
 			pwm_state = 1;
-		else
-			pwm_state = 0;
+		}
+		else if (clutch_a_duty > 0 && clutch_a_duty < 100)
+		{
+			OCR2A = PWM_DUTY_SCALE * clutch_a_duty;
+			pwm_state = 1;
+		}
+		else /// Both duty cycles are 0 or 100%
+		{
+			OCR2A = PWM_DUTY_SCALE * 100;
+		}
+		break;
 
+	case 1:
+		if (clutch_a_duty > clutch_b_duty)
+		{
+			if (clutch_a_duty ==  100)
+			{
+				driver_state |= SOL_CLUTCH_B;
+				OCR2A = PWM_DUTY_SCALE * (100 - clutch_b_duty);
+				pwm_state = 0;
+			}
+			else if (clutch_b_duty == 0)
+			{
+				driver_state |= SOL_CLUTCH_A;
+				OCR2A = PWM_DUTY_SCALE * (100 - clutch_a_duty);
+				pwm_state = 0;
+			}
+			else
+			{
+				driver_state |= SOL_CLUTCH_B;
+				OCR2A = PWM_DUTY_SCALE * (clutch_a_duty - clutch_b_duty);
+				pwm_state = 2;
+			}
+		}
+		else
+		{
+			if (clutch_b_duty == 100)
+			{
+				driver_state |= SOL_CLUTCH_A;
+				OCR2A = PWM_DUTY_SCALE * (100 - clutch_a_duty);
+				pwm_state = 0;
+			}
+			else if (clutch_a_duty == 0)
+			{
+				driver_state |= SOL_CLUTCH_B;
+				OCR2A = PWM_DUTY_SCALE * (100 - clutch_b_duty);
+				pwm_state = 0;
+			}
+			else
+			{
+				driver_state |= SOL_CLUTCH_A;
+				OCR2A = PWM_DUTY_SCALE * (clutch_b_duty - clutch_a_duty);
+				pwm_state = 2;
+			}
+		}
+		break;
+
+	case 2:
+		if (clutch_a_duty > clutch_b_duty)
+		{
+			driver_state |= SOL_CLUTCH_A;
+			OCR2A = PWM_DUTY_SCALE * (100 - clutch_a_duty);
+			pwm_state = 0;
+		}
+		else
+		{
+			driver_state |= SOL_CLUTCH_B;
+			OCR2A = PWM_DUTY_SCALE * (100 - clutch_b_duty);
+			pwm_state = 0;
+		}
 		break;
 	}
 
@@ -112,6 +133,9 @@ engine_init (void)
 	adc_init (0);
 	adc_set_conversion_callback (&engine_adc_callback);
 	adc_enable ();
+
+	/// Initialize ios for buffered output
+	DDRC |= _BV (PC0) | _BV (PC1) | _BV (PC2) | _BV (PC3) | _BV (PC4);
 }
 
 void
@@ -121,7 +145,36 @@ engine_set_clutch_position (uint8_t p)
 }
 
 void
-engine_adc_callback (uint8_t d)
+engine_set_upshift_state (uint8_t state)
+{
+	if (state)
+		driver_state |= SOL_UPSHIFT;
+	else
+		driver_state &= ~SOL_UPSHIFT;
+}
+
+void
+engine_set_downshift_state (uint8_t state)
+{
+	if (state)
+		driver_state |= SOL_DOWNSHIFT;
+	else
+		driver_state &= ~SOL_DOWNSHIFT;
+}
+
+void
+engine_set_shiftcut_state (uint8_t state)
+{
+	if (state)
+		PORTC |= IO_SHIFTCUT;
+	else
+		PORTC &= ~IO_SHIFTCUT;
+}
+
+/*** End of public function implementations ***/
+
+void
+engine_adc_callback (const uint8_t d)
 {
 	int8_t error;
 
@@ -190,7 +243,7 @@ engine_init_clutch_pwm (void)
 {
 	/// Initialize timer0 for generating the PWM
 	ASSR = _BV (AS2);					/// External 32.768kHz crystal source
-	TCCR2A |= _BV (WGM21) | _BV (CS21);	/// CTC mode, Prescale the system clock by 8
+	TCCR2A |= _BV (WGM21) | _BV (CS21);	/// CTC mode, Prescale the clock by 8
 	TIMSK2 = _BV (OCIE2A);				/// Interrupt on compare match
 }
 
@@ -211,7 +264,7 @@ engine_update_output_driver (void)
  */
 
 void
-engine_set_clutch_a_duty (uint8_t d)
+engine_set_clutch_a_duty (const uint8_t d)
 {
 	clutch_a_duty = d;
 }
@@ -221,7 +274,7 @@ engine_set_clutch_a_duty (uint8_t d)
  */
 
 void
-engine_set_clutch_b_duty (uint8_t d)
+engine_set_clutch_b_duty (const uint8_t d)
 {
 	clutch_b_duty = d;
 }

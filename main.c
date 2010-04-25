@@ -10,10 +10,6 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-#include <spi.h>
-#include <adc.h>
-#include <can.h>
-
 #include "engine.h"
 
 #define DAC_FAST_MODE	0x4000
@@ -44,21 +40,21 @@ main (void)
 	//adc_set_conversion_callback (&callback);
 	//adc_enable ();
 
-	can_init (baud_1000);
+//	can_init (baud_1000);
 
-	mob_config_t mob1;
-	mob1.id = 0xab;
-	mob1.id_type = standard;
-	mob1.mode = transmit;
+//	mob_config_t mob1;
+//	mob1.id = 0xab;
+//	mob1.id_type = standard;
+//	mob1.mode = transmit;
 
-	uint8_t data[] = "TESTING";
+//	uint8_t data[] = "TESTING";
 
-	can_config_mob (0, &mob1);
+//	can_config_mob (0, &mob1);
 
 	for (;;)
 	{
-		can_load_data (0, data, 7);
-		can_ready_to_send (0);
+		//can_load_data (0, data, 7);
+		//can_ready_to_send (0);
 /*
 		value = get_dac_word (cnt);
 

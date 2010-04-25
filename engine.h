@@ -9,6 +9,8 @@
 #ifndef ENGINE_H_
 #define ENGINE_H_
 
+#include <avr/io.h>
+
 /**
  * Initialize the engine module
  */
@@ -18,5 +20,15 @@ engine_init (void);
 
 void
 engine_set_clutch_position (uint8_t p);
+
+void
+engine_set_upshift_state (uint8_t state);
+
+void
+engine_set_downshift_state (uint8_t state);
+
+void
+engine_set_shiftcut_state (uint8_t state);
+
 
 #endif /* ENGINE_H_ */
