@@ -11,6 +11,7 @@
 
 #include <libspi/spi.h>
 #include <libadc/adc.h>
+#include <libcan/can.h>
 
 #include "engine.h"
 #include "engine_prv.h"
@@ -127,6 +128,8 @@ ISR(TIMER2_COMP_vect)
 void
 engine_init (void)
 {
+	engine_can_impl_init ();
+
 	engine_init_output_driver ();
 	engine_init_clutch_pwm ();
 

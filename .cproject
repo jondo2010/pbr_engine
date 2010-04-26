@@ -44,12 +44,14 @@
 <tool id="de.innot.avreclipse.tool.linker.winavr.app.debug.1371659466" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.debug">
 <option id="de.innot.avreclipse.linker.option.libs.160718820" name="Libraries (-l)" superClass="de.innot.avreclipse.linker.option.libs" valueType="libs">
 <listOptionValue builtIn="false" value="spi"/>
+<listOptionValue builtIn="false" value="pbr"/>
 <listOptionValue builtIn="false" value="eeprom"/>
 <listOptionValue builtIn="false" value="can"/>
 <listOptionValue builtIn="false" value="adc"/>
 </option>
 <option id="de.innot.avreclipse.linker.option.libpath.935698596" name="Libraries Path (-L)" superClass="de.innot.avreclipse.linker.option.libpath" valueType="stringList">
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libspi/Debug}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libpbr/Debug}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libeeprom/Debug}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libcan/Debug}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libadc/Debug}&quot;"/>

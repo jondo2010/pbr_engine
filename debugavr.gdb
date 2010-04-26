@@ -3,6 +3,7 @@ dir ../libusart
 dir ../libxbee
 dir ../libspi
 dir ../libadc
+dir ../libpbr
 
 set remoteaddresssize 32
 set remote Z-packet enable

@@ -10,17 +10,22 @@
 
 #include <avr/io.h>
 
-#define OTSTART_MIN_TIME	1000	/* 1 second */
-#define OTSTART_MAX_TIME	20000	/* 20 seconds */
-#define IDLE_MIN			0
-#define IDLE_MAX			10000
-
 typedef struct engine_param_struct_t
 {
+	uint8_t		otstart_enabled;
 	uint16_t	otstart_timeout;
 	uint16_t	idle_rpm;
 }
 engine_param_struct_t;
+
+typedef struct engine_param_limits_struct_t
+{
+	uint16_t	otstart_timeout_min;
+	uint16_t	otstart_timeout_max;
+	uint16_t	idle_rpm_min;
+	uint16_t	idle_rpm_max;
+}
+engine_param_limits_struct_t;
 
 /**
  * Initialize the engine parameter interface, restore from EEPROM

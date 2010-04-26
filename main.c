@@ -10,6 +10,8 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
+#include <libcan/can.h>
+
 #include "engine.h"
 
 #define DAC_FAST_MODE	0x4000
@@ -30,7 +32,9 @@ main (void)
 	DDRG |= _BV (PE2);
 
 	engine_init ();
-	engine_set_clutch_position (50);
+	//engine_set_clutch_position (50);
+
+	//can_init (can_baud_1000);
 
 	sei ();
 
