@@ -7,22 +7,11 @@
 
 #include <avr/io.h>
 #include <libeeprom/eeprom.h>
+#include <libpbr/param.h>
 
 #include "engine_param_iface.h"
 
-#define OTSTART_MIN_TIME	1000	/* 1 second */
-#define OTSTART_MAX_TIME	20000	/* 20 seconds */
-#define IDLE_MIN			0
-#define IDLE_MAX			10000
-
 static engine_param_struct_t params;
-const static engine_param_limits_struct_t param_limits =
-{
-	OTSTART_MIN_TIME,
-	OTSTART_MAX_TIME,
-	IDLE_MIN,
-	IDLE_MAX
-};
 
 void
 engine_param_iface_init (void)
@@ -42,17 +31,78 @@ engine_param_iface_get_param_struct (void)
 	return &params;
 }
 
-const engine_param_limits_struct_t *
-engine_param_iface_get_param_limits_struct (void)
+uint8_t
+engine_param_iface_get_param
+(
+	engine_param_t	p,
+	uint8_t			data[8]
+)
 {
-	return &param_limits;
+	switch (p) {
+		case param_engine_otstart_enabled:
+			*(uint16_t *)data = params.otstart_enabled;
+			break;
+		case param_engine_otstart_timeout:
+			*(uint16_t *)data = params.otstart_timeout;
+			break;
+		case param_engine_idle_rpm:
+			*(uint16_t *)data = params.idle_rpm;
+			break;
+		default:
+			break;
+	}
+	return engine_param_defs[p].size;
 }
 
-void
-engine_param_iface_set_otstart_on (uint8_t on);
-
-void
-engine_param_iface_set_otstart_timeout	(uint16_t t);
-
-void
-engine_param_iface_set_idle_rpm (uint16_t rpm);
+uint8_t
+engine_param_iface_set_param
+(
+	engine_param_t	p,
+	uint8_t			data[8]
+)
+{
+	switch (p)
+	{
+		case param_engine_otstart_enabled:
+			if (*(uint8_t *)data > 0)
+			{
+				params.otstart_enabled = 1;
+			}
+			else
+			{
+				params.otstart_enabled = 0;
+			}
+			break;
+		case param_engine_otstart_timeout:
+			if (*(uint16_t *)data > OTSTART_MAX_TIME)
+			{
+				params.otstart_timeout = OTSTART_MAX_TIME;
+			}
+			else if (*(uint16_t *)data < OTSTART_MIN_TIME)
+			{
+				params.otstart_timeout = OTSTART_MIN_TIME;
+			}
+			else
+			{
+				params.otstart_timeout = *(uint16_t *)data;
+			}
+			break;
+		case param_engine_idle_rpm:
+			if (*(uint16_t *)data > IDLE_MAX)
+			{
+				params.idle_rpm  = IDLE_MAX;
+			}
+			else if (*(uint16_t *)data < IDLE_MIN)
+			{
+				params.idle_rpm  = IDLE_MIN;
+			}
+			else
+			{
+				params.idle_rpm = *(uint16_t *)data;
+			}
+			break;
+		default:
+			break;
+	}
+	return 1;
+}

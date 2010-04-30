@@ -9,6 +9,25 @@
 #define ENGINE_PARAM_IFACE_H_
 
 #include <avr/io.h>
+#include <libpbr/param.h>
+
+#define ENGINE_MODULE_ID	0x01
+#define ENGINE_NUM_PARAMS	3
+
+#define OTSTART_MIN_TIME	1000	/* 1 second */
+#define OTSTART_MAX_TIME	20000	/* 20 seconds */
+#define OTSTART_GRAN		100
+#define IDLE_MIN			0
+#define IDLE_MAX			10000
+#define IDLE_GRAN			100
+
+typedef enum engine_param_t
+{
+	param_engine_otstart_enabled	= 0x00,		/* One-touch start */
+	param_engine_otstart_timeout	= 0x01,		/* Timeout in ms */
+	param_engine_idle_rpm			= 0x02
+}
+engine_param_t;
 
 typedef struct engine_param_struct_t
 {
@@ -18,17 +37,15 @@ typedef struct engine_param_struct_t
 }
 engine_param_struct_t;
 
-typedef struct engine_param_limits_struct_t
+const static module_param_t engine_param_defs[] =
 {
-	uint16_t	otstart_timeout_min;
-	uint16_t	otstart_timeout_max;
-	uint16_t	idle_rpm_min;
-	uint16_t	idle_rpm_max;
-}
-engine_param_limits_struct_t;
+	{"ENG OTSTRT ON",		2},
+	{"ENG OTSTRT TIME",	2},
+	{"ENG IDLE RPM",		2}
+};
 
 /**
- * Initialize the engine parameter interface, restore from EEPROM
+ * Initialise the engine parameter interface, restore from EEPROM
  */
 void
 engine_param_iface_init (void);
@@ -39,28 +56,18 @@ engine_param_iface_init (void);
 void
 engine_param_iface_store_param_struct (void);
 
-/**
- * Return a pointer to the parameter struct
- */
-const engine_param_struct_t *
-engine_param_iface_get_param_struct (void);
+uint8_t
+engine_param_iface_get_param
+(
+	engine_param_t	p,
+	uint8_t			data[8]
+);
 
-/**
- * Set one-touch start on or off
- */
-void
-engine_param_iface_set_otstart_on (uint8_t on);
-
-/**
- * Set the timeout for one-touch start
- */
-void
-engine_param_iface_set_otstart_timeout	(uint16_t t);
-
-/**
- * Set the threshold RPM for engine-running detection
- */
-void
-engine_param_iface_set_idle_rpm (uint16_t rpm);
+uint8_t
+engine_param_iface_set_param
+(
+	engine_param_t	p,
+	uint8_t			data[8]
+);
 
 #endif /* ENGINE_PARAM_IFACE_H_ */

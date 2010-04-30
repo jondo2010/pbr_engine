@@ -26,7 +26,7 @@ static uint8_t requested_clutch_position = 0;
 static uint8_t current_clutch_position = 0; /// Will eventually be replaced with fixed-length circular buffer
 
 /**
- * Timer 0 interrupt service routine. Handles accurate generation
+ * Timer 2 interrupt service routine. Handles accurate generation
  * of PWM signals for the clutch solenoids.
  */
 
@@ -244,7 +244,7 @@ engine_init_output_driver (void)
 void
 engine_init_clutch_pwm (void)
 {
-	/// Initialize timer0 for generating the PWM
+	/// Initialize timer2 for generating the PWM
 	ASSR = _BV (AS2);					/// External 32.768kHz crystal source
 	TCCR2A |= _BV (WGM21) | _BV (CS21);	/// CTC mode, Prescale the clock by 8
 	TIMSK2 = _BV (OCIE2A);				/// Interrupt on compare match

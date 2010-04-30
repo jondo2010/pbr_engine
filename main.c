@@ -7,10 +7,11 @@
  */
 
 #include <avr/io.h>
-#include <avr/interrupt.h>
 #include <util/delay.h>
-
+#include <avr/interrupt.h>
 #include <libcan/can.h>
+
+#include <libpbr/timeout.h>
 
 #include "engine.h"
 
@@ -26,6 +27,12 @@ get_dac_word
 	return DAC_FAST_MODE | (value << 4);
 }
 
+void
+test (void)
+{
+	PORTG ^= _BV (PG2);
+}
+
 int
 main (void)
 {
@@ -34,7 +41,8 @@ main (void)
 	engine_init ();
 	//engine_set_clutch_position (50);
 
-	//can_init (can_baud_1000);
+	timeout_init ();
+	timeout_set (25, test, 1);
 
 	sei ();
 
@@ -76,8 +84,8 @@ main (void)
 		cnt++;
 */
 
-		_delay_ms (50);
-		PORTG ^= _BV (PG2);
+		//_delay_ms (50);
+		//PORTG ^= _BV (PG2);
 	}
 
 	return 0;
